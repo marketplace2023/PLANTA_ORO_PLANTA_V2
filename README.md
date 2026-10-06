@@ -19,6 +19,10 @@ Tablero de gestión de una planta de beneficio de oro. Consume la API de `../pla
 
 **Fuera de alcance:** Marketplace, Proveedores, Servicios Profesionales y Cursos.
 
+## Registro y acceso
+
+Hay **una sola cuenta para todos los portales**: se crea desde «Crea una» en el login (nombre, apellido, correo y contraseña de al menos 10 caracteres) y esa misma credencial entra a los demás portales. Crear la cuenta no da acceso a nada por sí sola: al entrar por primera vez sin ninguna planta asignada, la persona **pide acceso a una planta** (de las que ya puede ver) y el administrador del ecosistema la aprueba eligiendo el rol (Administración → Solicitudes de acceso). Puede retirar sus solicitudes pendientes. Mientras la solicitud esté pendiente se puede preparar el perfil, pero no operar. La política de seguridad definitiva está por analizar.
+
 ## Ejecutar
 
 ```bash

@@ -4,6 +4,7 @@ import { Loading, Panel } from '@/components/kit'
 import { useAuth } from '@/features/auth/auth-context'
 import { usePlant } from '@/features/plant/plant-context'
 import { usePlantDetail } from '@/features/plant/use-plant-data'
+import { AccessRequestPage } from '@/pages/access-request-page'
 import { ApuEditorPage } from '@/pages/apu-editor-page'
 import { AssetsPage } from '@/pages/assets-page'
 import { BudgetEditorPage } from '@/pages/budget-editor-page'
@@ -19,10 +20,12 @@ import { TeamPage } from '@/pages/team-page'
 
 /** `/` → la última planta usada (o la primera visible). Sin sesión, al login. */
 function Home() {
-  const { status, access } = useAuth()
+  const { status, user, access } = useAuth()
   const { currentPlant, availablePlants, isLoadingPlants } = usePlant()
   if (status === 'loading' || isLoadingPlants) return <div className="p-8"><Loading rows={4} /></div>
   if (status === 'anonymous') return <Navigate to="/login" replace />
+  // Sin ninguna planta asignada (y sin ser administrador): puede pedir acceso a una planta.
+  if (!user?.isGlobalAdmin && access.length === 0) return <AccessRequestPage />
   const mine = availablePlants.find((p) => access.some((a) => a.plantId === p.id))
   const target = currentPlant ?? mine ?? availablePlants[0]
   if (!target) {
