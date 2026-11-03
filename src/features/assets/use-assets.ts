@@ -170,6 +170,7 @@ export type CatalogModel = {
   status: string
   specifications: Record<string, unknown>
   technicalData: Record<string, unknown>
+  networkCodes: string[]
   type: { id: string; code: string; name: string }
   family: { id: string; code: string; name: string; icon: string | null }
   manufacturer: { id: string; name: string; countryCode: string | null } | null

@@ -21,6 +21,8 @@ Tablero de gestión de una planta de beneficio de oro. Consume la API de `../pla
 
 La ficha técnica de cada activo se guarda como una copia independiente: editar especificaciones o componentes no modifica el catálogo ni otras unidades. Al cambiar el modelo de un activo existente se conserva su ficha; el botón **Reemplazar ficha por la del modelo** permite cargar otra vez la plantilla antes de guardar. Los datos técnicos también pueden quedar vacíos.
 
+El formulario permite elegir una sola red transversal. Al crear, se sugiere la primera red del modelo habilitada en la planta; se puede cambiar o quitar. Los activos existentes con varias redes conservan sus asociaciones hasta elegir expresamente una sola o quitar la asignación. El contrato de la API sigue admitiendo listas de redes.
+
 ## Registro y acceso
 
 Hay **una sola cuenta para todos los portales**: se crea desde «Crea una» en el login (nombre, apellido, correo y contraseña de al menos 10 caracteres) y esa misma credencial entra a los demás portales. Crear la cuenta no da acceso a nada por sí sola: al entrar por primera vez sin ninguna planta asignada, la persona **pide acceso a una planta** (de las que ya puede ver) y el administrador del ecosistema la aprueba eligiendo el rol (Administración → Solicitudes de acceso). Puede retirar sus solicitudes pendientes. Mientras la solicitud esté pendiente se puede preparar el perfil, pero no operar. La política de seguridad definitiva está por analizar.
