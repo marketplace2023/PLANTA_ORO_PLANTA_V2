@@ -12,12 +12,14 @@ Tablero de gestión de una planta de beneficio de oro. Consume la API de `../pla
 | Inventario | Crear/editar ítems, ingresos, salidas, transferencias y ajustes; almacenes y ubicaciones; solicitar reposición |
 | Compras | Crear/editar requisiciones, enviar, aprobar/rechazar, pedir cotizaciones (RFQ), adjudicar, recibir |
 | Presupuestos | Proyectos, presupuestos (capítulos, partidas), APU, libro de precios, escenarios y valorizaciones (editores en `/budgets/:id` y `/budgets/apus/:id`) |
-| Activos | Crear, editar y dar de baja |
+| Activos | Crear desde un modelo del catálogo, personalizar especificaciones y componentes propios, editar y dar de baja |
 | Documentos | Subir, nueva versión, editar, archivar y descargar |
 | Equipo | Asignar y retirar roles |
 | Procesos | Mapa de etapas, conexiones y redes (lectura) |
 
 **Fuera de alcance:** Marketplace, Proveedores, Servicios Profesionales y Cursos.
+
+La ficha técnica de cada activo se guarda como una copia independiente: editar especificaciones o componentes no modifica el catálogo ni otras unidades. Al cambiar el modelo de un activo existente se conserva su ficha; el botón **Reemplazar ficha por la del modelo** permite cargar otra vez la plantilla antes de guardar. Los datos técnicos también pueden quedar vacíos.
 
 ## Registro y acceso
 

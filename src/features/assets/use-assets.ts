@@ -115,6 +115,8 @@ export const useAssetFur = (slug: string | undefined, assetId: string | undefine
   })
 
 export type AssetInput = {
+  specifications?: Record<string, unknown>
+  components?: string[]
   tag: string
   name: string
   assetModelId: string
@@ -163,6 +165,7 @@ export function useDecommissionAsset(slug: string, assetId: string) {
 export type CatalogFamily = { id: string; code: string; name: string; icon: string | null }
 export type CatalogModel = {
   id: string
+  catalogTag?: string | null
   modelName: string
   status: string
   specifications: Record<string, unknown>
