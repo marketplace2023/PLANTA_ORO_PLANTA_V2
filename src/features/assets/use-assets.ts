@@ -117,7 +117,6 @@ export const useAssetFur = (slug: string | undefined, assetId: string | undefine
 export type AssetInput = {
   specifications?: Record<string, unknown>
   components?: string[]
-  tag: string
   name: string
   assetModelId: string
   stageCode?: string | null
@@ -128,6 +127,18 @@ export type AssetInput = {
   location?: string | null
   isPublic?: boolean
   networkCodes?: string[]
+}
+
+export type AssetTagSelection = { assetModelId: string; stageCode: string; networkCode: string }
+
+/** Vista previa sin reservar correlativo; cada combinación tiene su propia consulta. */
+export function useAssetTagPreview(slug: string, selection: AssetTagSelection | null, active = true) {
+  return useQuery({
+    queryKey: ['plant', slug, 'assets', 'tag-preview', selection],
+    queryFn: () => api<{ tag: string }>(`/plants/${slug}/assets/tag-preview${toQuery(selection ?? {})}`),
+    enabled: active && !!selection,
+    retry: false,
+  })
 }
 
 export function useCreateAsset(slug: string) {
@@ -172,7 +183,7 @@ export type CatalogModel = {
   technicalData: Record<string, unknown>
   networkCodes: string[]
   type: { id: string; code: string; name: string }
-  family: { id: string; code: string; name: string; icon: string | null }
+  family: { id: string; code: string; tagCode?: string; name: string; icon: string | null }
   manufacturer: { id: string; name: string; countryCode: string | null } | null
 }
 export type CatalogManufacturer = { id: string; name: string; countryCode: string | null }

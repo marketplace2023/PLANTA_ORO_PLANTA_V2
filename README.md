@@ -21,7 +21,7 @@ Tablero de gestión de una planta de beneficio de oro. Consume la API de `../pla
 
 La ficha técnica de cada activo se guarda como una copia independiente: editar especificaciones o componentes no modifica el catálogo ni otras unidades. Al cambiar el modelo de un activo existente se conserva su ficha; el botón **Reemplazar ficha por la del modelo** permite cargar otra vez la plantilla antes de guardar. Los datos técnicos también pueden quedar vacíos.
 
-El formulario permite elegir una sola red transversal. Al crear, se sugiere la primera red del modelo habilitada en la planta; se puede cambiar o quitar. Los activos existentes con varias redes conservan sus asociaciones hasta elegir expresamente una sola o quitar la asignación. El contrato de la API sigue admitiendo listas de redes.
+El alta requiere una etapa y una sola red transversal habilitadas en la planta. Se sugiere la primera red del modelo habilitada y se puede cambiar. El TAG se asigna al guardar con formato `FUR-PROC-D01-MOT-001`: red, etapa, código corto de familia y correlativo independiente por planta/red/etapa/familia. El TAG es permanente, incluso al cambiar la clasificación. Los TAG existentes no se renumeran. Los activos existentes con varias redes conservan sus asociaciones hasta elegir expresamente una sola o quitar la asignación. El contrato de la API sigue admitiendo listas de redes en las ediciones.
 
 ## Registro y acceso
 
