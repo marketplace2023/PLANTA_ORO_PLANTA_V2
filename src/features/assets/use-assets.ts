@@ -198,7 +198,7 @@ export const useCatalogFamilies = () =>
 export const useCatalogManufacturers = () =>
   useQuery({ queryKey: ['catalog', 'manufacturers'], queryFn: () => api<CatalogManufacturer[]>('/catalog/manufacturers'), staleTime: 5 * 60_000 })
 
-export type CatalogFilters = { family?: string; manufacturerId?: string; search?: string; page?: string; status?: 'ACTIVE' | 'INACTIVE' | 'ALL' }
+export type CatalogFilters = { stage?: string; network?: string; family?: string; manufacturerId?: string; search?: string; page?: string; status?: 'ACTIVE' | 'INACTIVE' | 'ALL' }
 
 export const useCatalogModels = (filters: CatalogFilters, pageSize = 24) =>
   useQuery({
