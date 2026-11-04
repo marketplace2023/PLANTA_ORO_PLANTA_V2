@@ -12,16 +12,14 @@ Tablero de gestión de una planta de beneficio de oro. Consume la API de `../pla
 | Inventario | Crear/editar ítems, ingresos, salidas, transferencias y ajustes; almacenes y ubicaciones; solicitar reposición |
 | Compras | Crear/editar requisiciones, enviar, aprobar/rechazar, pedir cotizaciones (RFQ), adjudicar, recibir |
 | Presupuestos | Proyectos, presupuestos (capítulos, partidas), APU, libro de precios, escenarios y valorizaciones (editores en `/budgets/:id` y `/budgets/apus/:id`) |
-| Activos | Crear desde un modelo del catálogo, personalizar especificaciones y componentes propios, editar y dar de baja |
+| Activos | Crear por red, etapa y familia, registrar datos propios y referencias opcionales del catálogo, editar y dar de baja |
 | Documentos | Subir, nueva versión, editar, archivar y descargar |
 | Equipo | Asignar y retirar roles |
 | Procesos | Mapa de etapas, conexiones y redes (lectura) |
 
 **Fuera de alcance:** Marketplace, Proveedores, Servicios Profesionales y Cursos.
 
-La ficha técnica de cada activo se guarda como una copia independiente: editar especificaciones o componentes no modifica el catálogo ni otras unidades. Al cambiar el modelo de un activo existente se conserva su ficha; el botón **Reemplazar ficha por la del modelo** permite cargar otra vez la plantilla antes de guardar. Los datos técnicos también pueden quedar vacíos.
-
-El alta requiere una etapa y una sola red transversal habilitadas en la planta. Se sugiere la primera red del modelo habilitada y se puede cambiar. El TAG se asigna al guardar con formato `FUR-PROC-D01-MOT-001`: red, etapa, código corto de familia y correlativo independiente por planta/red/etapa/familia. El TAG es permanente, incluso al cambiar la clasificación. Los TAG existentes no se renumeran. Los activos existentes con varias redes conservan sus asociaciones hasta elegir expresamente una sola o quitar la asignación. El contrato de la API sigue admitiendo listas de redes en las ediciones.
+Los activos se crean de forma independiente mediante red → etapa → familia con búsqueda. El nombre, las especificaciones y los componentes son propios y empiezan vacíos. Al final se pueden añadir modelos de la misma familia como referencias opcionales, sin copiar datos. El TAG se calcula por planta, red, etapa y familia y es permanente. Los activos existentes conservan su información.
 
 ## Registro y acceso
 

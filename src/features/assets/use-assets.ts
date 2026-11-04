@@ -19,8 +19,9 @@ export type AssetItem = {
   stage: { code: string; name: string; group: string } | null
   model: { id: string; name: string }
   type: { code: string; name: string }
-  family: { code: string; name: string }
+  family: { id?: string; code: string; tagCode?: string; name: string }
   manufacturer: string | null
+  referenceModels?: Array<{ id: string; modelName: string; catalogTag?: string | null }>
   networks: NetworkRef[]
 }
 
@@ -49,6 +50,7 @@ export type AssetFur = {
   asset: AssetDetail
   plant: { id: string; name: string; slug: string; code: string }
   stage: AssetItem['stage']
+  referenceModels?: Array<{ id: string; modelName: string; catalogTag?: string | null }>
   networks: NetworkRef[]
   documents: DocumentItem[]
   /** Vacío si quien consulta no tiene maintenance.read. */
@@ -115,10 +117,12 @@ export const useAssetFur = (slug: string | undefined, assetId: string | undefine
   })
 
 export type AssetInput = {
+  familyId?: string
+  referenceModelIds?: string[]
   specifications?: Record<string, unknown>
   components?: string[]
   name: string
-  assetModelId: string
+  assetModelId?: string
   stageCode?: string | null
   serialNumber?: string | null
   status?: AssetStatus
@@ -129,7 +133,7 @@ export type AssetInput = {
   networkCodes?: string[]
 }
 
-export type AssetTagSelection = { assetModelId: string; stageCode: string; networkCode: string }
+export type AssetTagSelection = { familyId: string; stageCode: string; networkCode: string }
 
 /** Vista previa sin reservar correlativo; cada combinación tiene su propia consulta. */
 export function useAssetTagPreview(slug: string, selection: AssetTagSelection | null, active = true) {
@@ -173,7 +177,7 @@ export function useDecommissionAsset(slug: string, assetId: string) {
 
 // ---------- Catálogo global ----------
 
-export type CatalogFamily = { id: string; code: string; name: string; icon: string | null }
+export type CatalogFamily = { id: string; tagCode?: string; code: string; name: string; icon: string | null }
 export type CatalogModel = {
   id: string
   catalogTag?: string | null
