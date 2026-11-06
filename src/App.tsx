@@ -7,6 +7,7 @@ import { usePlantDetail } from '@/features/plant/use-plant-data'
 import { AccessRequestPage } from '@/pages/access-request-page'
 import { ApuEditorPage } from '@/pages/apu-editor-page'
 import { AssetsPage } from '@/pages/assets-page'
+import { CatalogRequestsPage } from '@/pages/catalog-requests-page'
 import { BudgetEditorPage } from '@/pages/budget-editor-page'
 import { BudgetsPage } from '@/pages/budgets-page'
 import { DocumentsPage } from '@/pages/documents-page'
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="dashboard" element={<OverviewPage />} />
         <Route path="processes" element={<ProcessesPage />} />
         <Route path="assets" element={<AssetsPage />} />
+        <Route path="catalog-requests" element={<CatalogRequestsPage />} />
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="procurement" element={<ProcurementPage />} />

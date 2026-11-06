@@ -3,6 +3,7 @@ import {
   Calculator,
   ChevronsUpDown,
   Cog,
+  ClipboardList,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -34,6 +35,7 @@ const SECTIONS: Array<{ title: string; items: Item[] }> = [
       { to: 'dashboard', label: 'Resumen', icon: LayoutDashboard },
       { to: 'processes', label: 'Procesos', icon: Cog },
       { to: 'assets', label: 'Activos', icon: Package },
+      { to: 'catalog-requests', label: 'Solicitudes', icon: ClipboardList, perm: 'asset.create' },
     ],
   },
   {
