@@ -185,8 +185,10 @@ export type CatalogModel = {
   status: string
   specifications: Record<string, unknown>
   technicalData: Record<string, unknown>
+  imageUrl: string | null
+  stageCodes: string[]
   networkCodes: string[]
-  type: { id: string; code: string; name: string }
+  type: { id: string; code: string; name: string; description?: string | null; stageCodes?: string[] }
   family: { id: string; code: string; tagCode?: string; name: string; icon: string | null }
   manufacturer: { id: string; name: string; countryCode: string | null } | null
 }
