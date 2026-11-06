@@ -1,7 +1,8 @@
-import { Archive, ChevronDown, Pencil, Plus, Search } from 'lucide-react'
+import { Archive, ChevronDown, Eye, Pencil, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { AssetFormDialog } from '@/components/assets/asset-form-dialog'
+import { AssetFichaDialog } from '@/components/assets/asset-ficha-dialog'
 import { selectClass } from '@/components/action-dialog'
 import { BarRows, DataTable, Empty, Failed, Loading, Panel, Pill, ScreenHeader, td, type BarRow } from '@/components/kit'
 import { Button } from '@/components/ui/button'
@@ -57,6 +58,7 @@ function DecommissionDialog({ slug, asset, onClose }: { slug: string; asset: Ass
 export function AssetsPage() {
   const { slug, can } = usePlantAccess()
   const [creating, setCreating] = useState(false)
+  const [fichaId, setFichaId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [decomm, setDecomm] = useState<AssetItem | null>(null)
   const canWrite = can('asset.update') || can('asset.delete')
@@ -149,6 +151,7 @@ export function AssetsPage() {
                     <td className={td}>
                       <p className="font-medium text-fur-navy-900">{a.tag}</p>
                       <p className="text-xs text-muted-foreground">{a.name}</p>
+                      <Button size="xs" variant="outline" className="mt-2" aria-label={`Ver ficha de ${a.tag}`} onClick={() => setFichaId(a.id)}><Eye /> Ver ficha</Button>
                     </td>
                     <td className={`${td} fur-code text-xs`}>{a.furCode}</td>
                     <td className={td}>{a.stage?.name ?? '—'}</td>
@@ -189,6 +192,7 @@ export function AssetsPage() {
         )}
       </Panel>
       {creating && <AssetFormDialog open onOpenChange={(o) => !o && setCreating(false)} plantSlug={slug} onSaved={() => setCreating(false)} />}
+      {fichaId && <AssetFichaDialog key={`${slug}/${fichaId}`} plantSlug={slug} assetId={fichaId} onClose={() => setFichaId(null)} />}
       {editId && <EditAsset slug={slug} id={editId} onClose={() => setEditId(null)} />}
       {decomm && <DecommissionDialog slug={slug} asset={decomm} onClose={() => setDecomm(null)} />}
     </>
