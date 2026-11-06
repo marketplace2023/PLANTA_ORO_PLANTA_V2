@@ -149,8 +149,8 @@ export function AssetsPage() {
                 return (
                   <tr key={a.id}>
                     <td className={td}>
-                      <p className="font-medium text-fur-navy-900">{a.tag}</p>
-                      <p className="text-xs text-muted-foreground">{a.name}</p>
+                      <p className="fur-code text-xs font-medium text-muted-foreground">{a.tag}</p>
+                      <p className="mt-1 font-medium text-fur-navy-900">{a.name}</p>
                       <Button size="xs" variant="outline" className="mt-2" aria-label={`Ver ficha de ${a.tag}`} onClick={() => setFichaId(a.id)}><Eye /> Ver ficha</Button>
                     </td>
                     <td className={`${td} fur-code text-xs`}>{a.furCode}</td>
