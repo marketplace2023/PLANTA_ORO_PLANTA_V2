@@ -5,7 +5,7 @@ import type { AssetInput } from './use-assets'
 export type CatalogRequest = {
   id: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
-  draft: AssetInput & { familyId: string; stageCode: string; networkCodes: string[] }
+  draft: AssetInput & { familyId: string; stageCode: string; networkCodes: string[]; requestNote?: string }
   createdAt: string
   decidedAt: string | null
   decisionNote: string | null

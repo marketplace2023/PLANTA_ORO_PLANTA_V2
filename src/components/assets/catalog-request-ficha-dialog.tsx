@@ -55,6 +55,7 @@ export function CatalogRequestFichaDialog({ request, plantSlug, onClose }: { req
             ['Estado de la solicitud', <Pill {...REQUEST_STATUS[request.status]} />],
             ['Fecha de envío', formatDateTime(request.createdAt)],
             ['Fecha de decisión', formatDateTime(request.decidedAt)],
+            ['Nota de la solicitud', request.draft.requestNote || 'Sin nota.'],
             ['Comentario de administración', request.decisionNote || 'Sin comentarios.'],
           ]} />
         </section>

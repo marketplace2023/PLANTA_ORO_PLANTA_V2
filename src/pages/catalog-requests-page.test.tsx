@@ -18,7 +18,7 @@ function request(index: number, status: CatalogRequest['status'] = 'PENDING'): C
     decidedAt: status === 'PENDING' ? null : '2026-11-06T13:00:00Z',
     decisionNote: status === 'REJECTED' ? 'Falta información del equipo.' : null,
     assetId: status === 'APPROVED' ? 'a1' : null,
-    draft: { name: `Equipo ${index}`, familyId: 'f1', stageCode: 'D06', networkCodes: ['PTE'], serialNumber: `SN-${index}`, status: 'OPERATIVE', criticality: 'HIGH', isPublic: false, specifications: { power: 125, enabled: false, speed: { min: 0, max: 10 } }, components: [`Motor ${index}`] },
+    draft: { name: `Equipo ${index}`, familyId: 'f1', stageCode: 'D06', networkCodes: ['PTE'], serialNumber: `SN-${index}`, requestNote: 'Necesitamos esta variante.\nIncluye protección adicional.', status: 'OPERATIVE', criticality: 'HIGH', isPublic: false, specifications: { power: 125, enabled: false, speed: { min: 0, max: 10 } }, components: [`Motor ${index}`] },
   }
 }
 
@@ -44,6 +44,7 @@ it('muestra todas las solicitudes y abre la ficha original de cada fila, incluso
     expect(dialog.getByText(`SN-${index}`)).toBeInTheDocument()
     expect(dialog.getByText(`Motor ${index}`)).toBeInTheDocument()
     expect(dialog.getByText('Alta')).toBeInTheDocument()
+    expect(dialog.getByText('Necesitamos esta variante. Incluye protección adicional.')).toBeInTheDocument()
     if (index === 1) expect(dialog.getByText('Falta información del equipo.')).toBeInTheDocument()
     await userEvent.click(dialog.getByRole('button', { name: 'Cerrar ficha' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
