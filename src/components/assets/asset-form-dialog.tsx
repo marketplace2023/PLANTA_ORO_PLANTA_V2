@@ -26,6 +26,7 @@ import {
 } from '@/features/assets/use-assets'
 import { usePlantNetworks, usePlantStages } from '@/features/plant/use-plant-data'
 import { api, ApiError } from '@/lib/api'
+import type { CatalogRequest } from '@/features/assets/use-catalog-requests'
 import { ASSET_CRITICALITIES, ASSET_STATUSES, criticalityLabel, statusLabel, type AssetCriticality, type AssetStatus } from '@/lib/assets'
 
 const NO_STAGE = '__none__'
@@ -38,6 +39,7 @@ type Props = {
   plantSlug: string
   /** Si se pasa un activo, el formulario edita; si no, crea. */
   asset?: AssetDetail
+  baseRequest?: CatalogRequest
   onSaved?: (asset: AssetDetail) => void
 }
 
@@ -45,33 +47,34 @@ type Props = {
  * Alta/edición de activo. Las etapas y redes ofrecidas son solo las habilitadas en la planta (§47):
  * la UI no ofrece lo que el backend rechazaría. Quien lo muestra lo protege con PermissionGate.
  */
-export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, onSaved }: Props) {
+export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, baseRequest, onSaved }: Props) {
   const editing = !!asset
+  const initial = !editing ? baseRequest?.draft : undefined
   const create = useCreateAsset(plantSlug)
   const update = useUpdateAsset(plantSlug, asset?.id ?? '')
   const queryClient = useQueryClient()
-  const [requestMode, setRequestMode] = useState(false)
-  const [requestNote, setRequestNote] = useState('')
-  const submitRequest = useMutation({ mutationFn: (body: AssetInput & { requestNote?: string }) => api(`/plants/${plantSlug}/catalog-requests`, { method: 'POST', body: JSON.stringify(body) }) })
+  const [requestMode, setRequestMode] = useState(!!initial)
+  const [requestNote, setRequestNote] = useState(initial?.requestNote ?? '')
+  const submitRequest = useMutation({ mutationFn: (body: AssetInput & { requestNote?: string; sourceRequestId?: string }) => api(`/plants/${plantSlug}/catalog-requests`, { method: 'POST', body: JSON.stringify(body) }) })
   const pending = editing ? update.isPending : create.isPending || submitRequest.isPending
 
   const [modelSearch, setModelSearch] = useState('')
   const search = useDebouncedValue(modelSearch.trim())
-  const [technical, setTechnical] = useState(() => technicalDraft(asset?.specifications, asset?.technicalData))
+  const [technical, setTechnical] = useState(() => initial ? technicalDraft(structuredClone(initial.specifications ?? {}), { componentes: structuredClone(initial.components ?? []) }) : technicalDraft(asset?.specifications, asset?.technicalData))
   const stages = usePlantStages(plantSlug)
   const networks = usePlantNetworks(plantSlug)
 
   const [form, setForm] = useState({
-    name: asset?.name ?? '',
-    familyId: asset?.family.id ?? '',
-    stageCode: asset?.stage?.code ?? NO_STAGE,
-    serialNumber: asset?.serialNumber ?? '',
-    status: (asset?.status ?? 'OPERATIVE') as AssetStatus,
+    name: asset?.name ?? initial?.name ?? '',
+    familyId: asset?.family.id ?? initial?.familyId ?? '',
+    stageCode: asset?.stage?.code ?? initial?.stageCode ?? NO_STAGE,
+    serialNumber: asset?.serialNumber ?? initial?.serialNumber ?? '',
+    status: (asset?.status ?? initial?.status ?? 'OPERATIVE') as AssetStatus,
     statusReason: '',
-    criticality: (asset?.criticality ?? 'MEDIUM') as AssetCriticality,
-    isPublic: asset?.isPublic ?? false,
+    criticality: (asset?.criticality ?? initial?.criticality ?? 'MEDIUM') as AssetCriticality,
+    isPublic: asset?.isPublic ?? initial?.isPublic ?? false,
     // La clasificación del activo se elige directamente en la planta.
-    networkCodes: asset?.networks.map((n) => n.code) ?? ([] as string[]),
+    networkCodes: asset?.networks.map((n) => n.code) ?? [...(initial?.networkCodes ?? [])],
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string>()
@@ -132,7 +135,7 @@ export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, onSaved 
 
     try {
       if (!editing && requestMode) {
-        await submitRequest.mutateAsync({ ...common, stageCode: stageCode!, ...(requestNote.trim() && { requestNote: requestNote.trim() }), ...(form.serialNumber.trim() && { serialNumber: form.serialNumber.trim() }) })
+        await submitRequest.mutateAsync({ ...common, stageCode: stageCode!, ...(baseRequest && { sourceRequestId: baseRequest.id }), ...(requestNote.trim() && { requestNote: requestNote.trim() }), ...(form.serialNumber.trim() && { serialNumber: form.serialNumber.trim() }) })
         await queryClient.invalidateQueries({ queryKey: ['plant', plantSlug, 'catalog-requests'] })
         toast.success('Solicitud enviada. El activo se registrará cuando administración la apruebe.')
         onOpenChange(false)
@@ -183,11 +186,11 @@ export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, onSaved 
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-fur-gold-500/15 text-fur-navy-900"><Package className="size-5" aria-hidden /></span>
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
-                <DialogTitle className="truncate text-xl leading-snug font-semibold tracking-tight" title={editing ? asset.tag : undefined}>{editing ? 'Editar ' + asset.tag : 'Nuevo activo'}</DialogTitle>
+                <DialogTitle className="truncate text-xl leading-snug font-semibold tracking-tight" title={editing ? asset.tag : undefined}>{editing ? 'Editar ' + asset.tag : baseRequest ? 'Nueva solicitud' : 'Nuevo activo'}</DialogTitle>
                 {!editing && <span aria-label="Vista previa del TAG" aria-live="polite" aria-atomic="true" title={tagPreview} className="fur-code max-w-full truncate rounded-lg border border-fur-gold-500/30 bg-fur-gold-500/10 px-2.5 py-1 text-xs font-medium text-fur-navy-900">{tagPreview}</span>}
               </div>
               <DialogDescription className="text-sm leading-relaxed [overflow-wrap:anywhere]">
-                {editing ? 'El código FUR (' + asset.furCode + ') es permanente.' : 'El TAG y el código FUR se asignan al guardar.'}
+                {editing ? 'El código FUR (' + asset.furCode + ') es permanente.' : baseRequest ? 'Revisa y ajusta la ficha antes de enviar una nueva solicitud.' : 'El TAG y el código FUR se asignan al guardar.'}
               </DialogDescription>
             </div>
             <DialogClose asChild><Button type="button" variant="ghost" size="icon-sm" className="shrink-0 rounded-lg" aria-label="Cerrar"><X className="size-4" /></Button></DialogClose>
@@ -196,6 +199,11 @@ export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, onSaved 
 
         <form onSubmit={onSubmit} className="flex min-h-0 min-w-0 flex-1 flex-col" noValidate>
           <div className="min-h-0 min-w-0 flex-1 space-y-7 overflow-x-hidden overflow-y-auto overscroll-contain px-5 py-6 sm:px-7">
+            {baseRequest && <section className="space-y-2 rounded-lg border border-fur-gold-500/40 bg-fur-gold-500/10 p-4 text-sm" aria-label="Solicitud rechazada de origen">
+              <h3 className="font-semibold">Basada en la solicitud rechazada: {baseRequest.draft.name}</h3>
+              <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">Motivo del rechazo: {baseRequest.decisionNote || 'Sin comentario de administración.'}</p>
+              <p className="text-xs text-muted-foreground">La solicitud anterior se conserva. Esta ficha se enviará como una nueva solicitud pendiente de revisión.</p>
+            </section>}
             <section className="min-w-0 space-y-5" aria-label="Clasificación e identificación">
               <h3 className="flex items-center gap-2 text-sm font-semibold"><ClipboardList className="size-4 text-fur-navy-900" aria-hidden /> Clasificación e identificación</h3>
               <div className="min-w-0 space-y-2">
@@ -240,13 +248,13 @@ export function AssetFormDialog({ open, onOpenChange, plantSlug, asset, onSaved 
               </div>
 
               <div className="min-w-0 space-y-3 rounded-lg border border-border p-4">
-                <Label htmlFor="assetModelId">Modelo de origen del catálogo *</Label>
+                <Label htmlFor="assetModelId">{requestMode ? 'Solicitud de incorporación al catálogo' : 'Modelo de origen del catálogo *'}</Label>
                 {!requestMode && (familyId && form.stageCode !== NO_STAGE && networkCodes.length === 1 ? <CatalogModelPicker
                   value={references[0]?.id ?? ''} selected={references[0] ?? null} items={models.data?.items ?? []} total={models.data?.total ?? 0}
                   search={modelSearch} onSearchChange={setModelSearch} onSelect={selectModel}
                   loading={models.isFetching || modelSearch.trim() !== search} failed={models.isError} onRetry={() => void models.refetch()} invalid={!!errors.assetModelId} /> : <p className="text-sm text-muted-foreground">Selecciona la red, la etapa y la familia para consultar sus modelos.</p>)}
                 {fieldError('assetModelId')}
-                {!editing && <label className="flex cursor-pointer items-start gap-3 text-sm"><Checkbox checked={requestMode} onCheckedChange={on => { setRequestMode(on === true); setReferences([]) }} /><span>No existe en el catálogo: solicitar incorporación<span className="mt-1 block text-xs text-muted-foreground">Completa la ficha. Administración la revisará y completará el catálogo. El activo se creará únicamente después de su aprobación.</span></span></label>}
+                {!editing && !baseRequest && <label className="flex cursor-pointer items-start gap-3 text-sm"><Checkbox checked={requestMode} onCheckedChange={on => { setRequestMode(on === true); setReferences([]) }} /><span>No existe en el catálogo: solicitar incorporación<span className="mt-1 block text-xs text-muted-foreground">Completa la ficha. Administración la revisará y completará el catálogo. El activo se creará únicamente después de su aprobación.</span></span></label>}
                 {!editing && requestMode && <div className="space-y-2">
                   <Label htmlFor="requestNote">Nota de la solicitud (opcional)</Label>
                   <Textarea id="requestNote" value={requestNote} onChange={e => setRequestNote(e.target.value)} maxLength={5000} rows={4} className="resize-y" placeholder="Explica los motivos de la incorporación y cualquier contexto que ayude a administración a evaluar la solicitud." aria-describedby="request-note-hint" />

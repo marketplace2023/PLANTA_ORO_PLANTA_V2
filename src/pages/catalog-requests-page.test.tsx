@@ -5,6 +5,7 @@ import { renderWithProviders } from '@/test/render'
 import { mockApi } from '@/test/fetch-mock'
 import type { CatalogRequest } from '@/features/assets/use-catalog-requests'
 import { CatalogRequestsPage } from './catalog-requests-page'
+import { STAGES, NETWORKS, page } from '@/test/assets-fixtures'
 
 const access = vi.hoisted(() => ({ allowed: true }))
 vi.mock('@/components/use-plant-access', () => ({
@@ -34,6 +35,7 @@ it('muestra todas las solicitudes y abre la ficha original de cada fila, incluso
   expect(await screen.findAllByRole('button', { name: /Ver ficha de Equipo/ })).toHaveLength(12)
   expect(screen.getByText('Aprobada: activo registrado')).toBeInTheDocument()
   expect(screen.getByText('Rechazada')).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: /Crear nueva solicitud a partir de/ })).toHaveLength(1)
   for (const index of [11, 0, 1]) {
     await userEvent.click(screen.getByRole('button', { name: `Ver ficha de Equipo ${index}` }))
     const dialog = within(await screen.findByRole('dialog', { name: 'Ficha de solicitud' }))
@@ -50,6 +52,57 @@ it('muestra todas las solicitudes y abre la ficha original de cada fila, incluso
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   }
   expect(api.calls.every(call => call.method === 'GET')).toBe(true)
+})
+
+it('precarga una rechazada desde el listado o la ficha y envía una solicitud independiente con las correcciones', async () => {
+  const source = request(1, 'REJECTED')
+  source.draft.networkCodes = ['FUR-PTE']
+  const original = structuredClone(source)
+  let rows = [source]
+  const api = mockApi({
+    'GET /plants/revemin-ii/catalog-requests': () => ({ body: rows }),
+    'GET /catalog/families': { body: [{ id: 'f1', code: 'MOT', tagCode: 'MOT', name: 'Motores' }] },
+    'GET /plants/revemin-ii/stages': { body: STAGES },
+    'GET /plants/revemin-ii/networks': { body: NETWORKS },
+    'GET /catalog/assets': { body: page([]) },
+    'GET /plants/revemin-ii/assets/tag-preview': { body: { tag: 'FUR-PTE-D06-MOT-001' } },
+    'GET /catalog/specifications': { body: [{ id: 'spec1', familyId: 'f1', key: 'power', label: 'Potencia', unit: 'kW', valueType: 'TEXT', required: false, sortOrder: 1 }] },
+    'POST /plants/revemin-ii/catalog-requests': ({ init }) => {
+      const draft = JSON.parse(init.body as string)
+      const saved = { ...request(2), draft }
+      rows = [saved, source]
+      return { status: 201, body: saved }
+    },
+  })
+  renderWithProviders(<CatalogRequestsPage />)
+  await userEvent.click(await screen.findByRole('button', { name: 'Crear nueva solicitud a partir de Equipo 1' }))
+  let form = within(await screen.findByRole('dialog', { name: 'Nueva solicitud' }))
+  expect(form.getByLabelText('Nombre')).toHaveValue('Equipo 1')
+  expect(form.getByLabelText('Número de serie')).toHaveValue('SN-1')
+  expect(form.getByLabelText('Nota de la solicitud (opcional)')).toHaveValue(source.draft.requestNote)
+  expect(form.getByText('Motivo del rechazo: Falta información del equipo.')).toBeInTheDocument()
+  expect(await form.findByLabelText(/Potencia/)).toHaveValue('125')
+  expect(form.getByLabelText('Componente 1')).toHaveValue('Motor 1')
+  await userEvent.click(form.getByRole('button', { name: 'Cancelar' }))
+  expect(api.calls.every(c => c.method === 'GET')).toBe(true)
+  await userEvent.click(screen.getByRole('button', { name: 'Ver ficha de Equipo 1' }))
+  await userEvent.click(within(await screen.findByRole('dialog', { name: 'Ficha de solicitud' })).getByRole('button', { name: 'Crear nueva solicitud' }))
+  form = within(await screen.findByRole('dialog', { name: 'Nueva solicitud' }))
+  await userEvent.clear(form.getByLabelText('Nombre'))
+  await userEvent.type(form.getByLabelText('Nombre'), 'Equipo corregido')
+  await userEvent.clear(form.getByLabelText('Nota de la solicitud (opcional)'))
+  await userEvent.type(form.getByLabelText('Nota de la solicitud (opcional)'), 'Motivos ampliados')
+  await userEvent.clear(form.getByLabelText(/Potencia/))
+  await userEvent.type(form.getByLabelText(/Potencia/), '150')
+  await userEvent.click(form.getByRole('button', { name: 'Enviar solicitud' }))
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  expect(await screen.findByRole('button', { name: 'Ver ficha de Equipo corregido' })).toBeInTheDocument()
+  expect(screen.getByText('Rechazada')).toBeInTheDocument()
+  const body = JSON.parse(api.calls.find(c => c.method === 'POST')!.init.body as string)
+  expect(body).toMatchObject({ sourceRequestId: source.id, name: 'Equipo corregido', requestNote: 'Motivos ampliados', familyId: 'f1', stageCode: 'D06', networkCodes: ['FUR-PTE'], serialNumber: 'SN-1', criticality: 'HIGH', status: 'OPERATIVE', isPublic: false, specifications: { power: '150', enabled: false, speed: { min: 0, max: 10 } }, components: ['Motor 1'] })
+  expect(body).not.toHaveProperty('assetModelId')
+  expect(api.calls.filter(c => c.method !== 'GET')).toHaveLength(1)
+  expect(source).toEqual(original)
 })
 
 it('permite reintentar una carga fallida y muestra el listado vacío', async () => {

@@ -22,7 +22,7 @@ function Fields({ rows }: { rows: Array<[string, ReactNode]> }) {
   ))}</dl>
 }
 
-export function CatalogRequestFichaDialog({ request, plantSlug, onClose }: { request: CatalogRequest; plantSlug: string; onClose: () => void }) {
+export function CatalogRequestFichaDialog({ request, plantSlug, onClose, onCreateFromRejected }: { request: CatalogRequest; plantSlug: string; onClose: () => void; onCreateFromRejected?: () => void }) {
   const { draft } = request
   const families = useCatalogFamilies()
   const stages = usePlantStages(plantSlug)
@@ -86,6 +86,7 @@ export function CatalogRequestFichaDialog({ request, plantSlug, onClose }: { req
           {components.length ? <ul className="list-disc space-y-2 py-4 pr-4 pl-9 text-sm">{components.map((component, index) => <li key={index} className="whitespace-pre-wrap [overflow-wrap:anywhere]">{component}</li>)}</ul> : <p className="p-4 text-sm text-muted-foreground">Sin componentes registrados.</p>}
         </section>
       </div>
+      {request.status === 'REJECTED' && onCreateFromRejected && <footer className="shrink-0 border-t p-4 text-right"><Button onClick={onCreateFromRejected}>Crear nueva solicitud</Button></footer>}
     </DialogContent>
   </Dialog>
 }
