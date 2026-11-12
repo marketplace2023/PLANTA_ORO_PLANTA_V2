@@ -18,7 +18,7 @@ it('permite consultar y cerrar la ficha del activo sin permisos de edición, con
     'GET /plants/revemin-ii/assets': { body: page([asset()]) },
     'GET /plants/revemin-ii/assets/a1/fur': { body: fur({}, {
       family: { id: 'f1', code: 'MOLINOS', name: 'Molinos' },
-      specifications: { powerKw: 125, enabled: false, speed: { min: 0, max: 10 } },
+      specifications: { powerKw: 125, enabled: false, speed: { min: 0, max: 10 }, rangoNoAplicable: '  NO APLICA  ' },
       technicalData: { componentes: ['Motor instalado', 'Transmisión propia'] },
       referenceModels: [{ id: 'm1', modelName: 'Modelo orientativo', catalogTag: 'CAT-001' }],
     }) },
@@ -35,6 +35,7 @@ it('permite consultar y cerrar la ficha del activo sin permisos de edición, con
   expect(dialog.getByText('125')).toBeInTheDocument()
   expect(dialog.getByText('No')).toBeInTheDocument()
   expect(dialog.getByText('0 – 10')).toBeInTheDocument()
+  expect(dialog.queryByText(/no aplica|rango No Aplicable/i)).not.toBeInTheDocument()
   expect(dialog.getByText('CAT-001 · Modelo orientativo')).toBeInTheDocument()
   expect(dialog.getByText('SN-0001')).toBeInTheDocument()
   await userEvent.click(dialog.getByRole('button', { name: 'Cerrar ficha' }))
@@ -49,7 +50,7 @@ it('muestra un error recuperable y los estados vacíos de una ficha sin datos t�
     'GET /plants/revemin-ii/assets': { body: page([asset()]) },
     'GET /plants/revemin-ii/assets/a1/fur': () => failed
       ? { status: 500, body: { message: 'Error' } }
-      : { body: fur({}, { specifications: {}, technicalData: {}, serialNumber: null, referenceModels: [] }) },
+      : { body: fur({}, { specifications: { soloNoAplica: 'No aplica' }, technicalData: {}, serialNumber: null, referenceModels: [] }) },
   })
   renderWithProviders(<AssetsPage />)
   await userEvent.click(await screen.findByRole('button', { name: 'Ver ficha de MB-301' }))

@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { useAssetFur } from '@/features/assets/use-assets'
 import { api } from '@/lib/api'
 import { CRITICALITY_META, STATUS_META } from '@/lib/assets'
-import { formatSpecificationValue } from '@/lib/specification-value'
+import { formatSpecificationValue, visibleSpecificationEntries } from '@/lib/specification-value'
 import type { FamilySpecification } from './family-specification-fields'
 
 function Section({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
@@ -49,6 +49,7 @@ export function AssetFichaDialog({ plantSlug, assetId, onClose }: { plantSlug: s
   }
   const components = Array.isArray(asset?.technicalData?.componentes)
     ? asset.technicalData.componentes.filter((value): value is string => typeof value === 'string' && !!value.trim()) : []
+  const specifications = visibleSpecificationEntries(asset?.specifications)
   const references = fur.data?.referenceModels ?? asset?.referenceModels ?? []
 
   return (
@@ -85,7 +86,7 @@ export function AssetFichaDialog({ plantSlug, assetId, onClose }: { plantSlug: s
             </Section>
             <Section icon={Settings2} title="2. Especificaciones técnicas">
               {definitions.isError && <p className="px-5 pt-4 text-xs text-muted-foreground">No se pudieron cargar las etiquetas de la familia. Se muestran las claves guardadas.</p>}
-              {Object.keys(asset.specifications).length ? <KeyValue rows={Object.entries(asset.specifications).map(([key, value]) => [specLabel(key), formatSpecificationValue(value)])} /> : <p className="p-5 text-sm text-muted-foreground">Sin especificaciones registradas.</p>}
+              {specifications.length ? <KeyValue rows={specifications.map(([key, value]) => [specLabel(key), formatSpecificationValue(value)])} /> : <p className="p-5 text-sm text-muted-foreground">Sin especificaciones registradas.</p>}
             </Section>
             <Section icon={ListChecks} title="3. Componentes del activo">
               {components.length ? <ul className="list-disc space-y-2 py-4 pr-5 pl-10 text-sm text-fur-gray-800">{components.map((component, index) => <li key={index} className="whitespace-pre-wrap [overflow-wrap:anywhere]">{component}</li>)}</ul> : <p className="p-5 text-sm text-muted-foreground">Sin componentes registrados.</p>}

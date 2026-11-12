@@ -10,7 +10,7 @@ import { usePlantNetworks, usePlantStages } from '@/features/plant/use-plant-dat
 import { api } from '@/lib/api'
 import { criticalityLabel, statusLabel } from '@/lib/assets'
 import { formatDateTime } from '@/lib/format'
-import { formatSpecificationValue } from '@/lib/specification-value'
+import { formatSpecificationValue, visibleSpecificationEntries } from '@/lib/specification-value'
 import type { FamilySpecification } from './family-specification-fields'
 
 function Fields({ rows }: { rows: Array<[string, ReactNode]> }) {
@@ -34,7 +34,7 @@ export function CatalogRequestFichaDialog({ request, plantSlug, onClose, onCreat
   })
   const family = families.data?.find(item => item.id === draft.familyId)
   const stage = stages.data?.find(item => item.code === draft.stageCode)
-  const specifications = Object.entries(draft.specifications ?? {})
+  const specifications = visibleSpecificationEntries(draft.specifications)
   const components = draft.components ?? []
   const sectionClass = 'overflow-hidden rounded-xl border border-border bg-card'
   const headingClass = 'border-b border-border px-4 py-3 text-sm font-semibold text-fur-navy-900'
