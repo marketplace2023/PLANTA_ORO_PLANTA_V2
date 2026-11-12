@@ -1,3 +1,4 @@
+import { CommandDeck, RadialMetric, type DeckAction } from '@/components/ui/studio'
 import { AlertOctagon, AlertTriangle, ArrowRight, ChevronRight, Info, ShoppingCart, Wallet, Warehouse, Wrench, Package, Gauge, type LucideIcon } from 'lucide-react'
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
@@ -45,16 +46,25 @@ export function OverviewPage() {
   const typeRows: BarRow[] = (Object.keys(TYPE_LABELS) as WorkOrderType[]).map((t) => ({ key: t, label: TYPE_LABELS[t], value: mnt.data?.openByType[t] ?? 0 }))
   const rqRows: BarRow[] = REQUISITION_STATUSES.filter((s) => s !== 'CANCELLED').map((s) => ({ key: s, label: REQUISITION_STATUS_META[s].label, value: proc.data?.byStatus[s] ?? 0, color: REQUISITION_STATUS_META[s].color, icon: REQUISITION_STATUS_META[s].icon }))
 
+  const actions: DeckAction[] = [
+    { to: `${base}/assets`, title: 'Explorar activos', description: 'Equipos y estado de tu planta', icon: Package },
+    ...(can('maintenance.read') ? [{ to: `${base}/maintenance`, title: 'Mantenimiento', description: mnt.data ? `${mnt.data.open} órdenes abiertas` : 'Planifica y gestiona el trabajo', icon: Wrench }] : []),
+    ...(can('inventory.read') ? [{ to: `${base}/inventory`, title: 'Almacén e inventario', description: inv.data ? `${inv.data.lowStockCount} ítems bajo el mínimo` : 'Revisa tus existencias', icon: Warehouse }] : []),
+    { to: `${base}/processes`, title: 'Explorar procesos', description: 'La planta, etapa por etapa', icon: Gauge },
+  ]
   const parts = mnt.data?.partsCostLast30Days ?? 0
   const other = mnt.data?.otherCostLast30Days ?? 0
   const totalCost = mnt.data?.totalCostLast30Days ?? 0
 
   return (
-    <>
+    <div className="studio-dashboard operations-dashboard">
       <ScreenHeader title="Resumen operacional" description={`Estado en vivo de ${plant?.name ?? 'la planta'}: operación, mantenimiento, inventario, compras y presupuesto.`} />
 
+      <CommandDeck eyebrow={plant?.name ?? 'Centro de operaciones'} title="Tu planta, en perspectiva." description="Del estado de los activos a las prioridades del día. Una vista conectada para decidir dónde enfocar el trabajo."
+        metric={<><RadialMetric value={totals ? Math.max(0, totals.assets - totals.attention) : 0} total={totals?.assets ?? 0} label="Activos sin alertas" loading={process.isLoading} /><span className="radial-caption">Activos sin alertas</span></>}
+        actions={actions.slice(0, 3)} />
       {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+      <div className="metrics-bento">
         {totals && <Kpi label="Activos" value={totals.assets} icon={Package} to={`${base}/assets`} tone={totals.attention > 0 ? 'warning' : 'ok'} hint={totals.attention > 0 ? `${totals.attention} requieren atención` : 'Todos sin alertas'} />}
         {mnt.data && <Kpi label="OT abiertas" value={mnt.data.open} icon={Wrench} to={`${base}/maintenance`} tone={mnt.data.overdue > 0 ? 'danger' : 'ok'} hint={`${mnt.data.overdue} vencidas · ${mnt.data.inProgress} en ejecución`} />}
         {mnt.data && <Kpi label="Preventivo cumplido" value={formatPct(mnt.data.preventiveCompliancePct)} icon={Gauge} to={`${base}/maintenance`} hint={mnt.data.mttrHours === null ? 'MTTR sin datos' : `MTTR ${mnt.data.mttrHours.toFixed(1)} h`} />}
@@ -93,10 +103,10 @@ export function OverviewPage() {
         ) : stages.length === 0 ? (
           <Empty>No hay etapas habilitadas en esta planta.</Empty>
         ) : (
-          <ol className="flex items-stretch gap-1 overflow-x-auto pb-1">
+          <ol className="stage-conveyor">
             {stages.map((s, i) => (
               <Fragment key={s.id}>
-                <li className="w-40 shrink-0 rounded-lg border border-border bg-fur-gray-50 p-3" style={{ borderTopColor: (s.attentionAssets ?? 0) > 0 ? 'var(--fur-orange-500)' : 'var(--fur-navy-800)', borderTopWidth: 3 }}>
+                <li className="conveyor-node" style={{ borderTopColor: (s.attentionAssets ?? 0) > 0 ? 'var(--fur-orange-500)' : 'var(--fur-navy-800)', borderTopWidth: 3 }}>
                   <p className="fur-code text-[11px] text-muted-foreground">{s.code}</p>
                   <p className="truncate text-sm font-semibold text-fur-navy-900" title={s.name}>{s.name}</p>
                   <dl className="mt-2 space-y-0.5 text-xs text-fur-gray-600">
@@ -114,7 +124,7 @@ export function OverviewPage() {
 
       {/* Mantenimiento */}
       {can('maintenance.read') && (
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <div className="operations-bento">
           <Panel title="Órdenes de trabajo por estado">
             {mnt.isLoading ? <Loading /> : mnt.isError ? <Failed onRetry={() => void mnt.refetch()} /> : <BarRows rows={woRows} empty="No hay órdenes de trabajo" />}
           </Panel>
@@ -167,7 +177,7 @@ export function OverviewPage() {
       )}
 
       {/* Inventario y compras */}
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="operations-bento">
         {can('inventory.read') && (
           <Panel title="Repuestos bajo el mínimo" subtitle="Existencias frente al stock mínimo" className="lg:col-span-2" flush action={<Link to={`${base}/inventory`} className="inline-flex items-center gap-1 text-xs font-semibold text-fur-navy-900 hover:underline">Ir a inventario <ArrowRight className="size-3.5" /></Link>}>
             {inv.isLoading ? (
@@ -217,6 +227,6 @@ export function OverviewPage() {
           </Panel>
         )}
       </div>
-    </>
+    </div>
   )
 }

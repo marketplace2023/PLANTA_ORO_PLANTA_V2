@@ -9,6 +9,7 @@ import { ApuEditorPage } from '@/pages/apu-editor-page'
 import { AssetsPage } from '@/pages/assets-page'
 import { BudgetEditorPage } from '@/pages/budget-editor-page'
 import { BudgetsPage } from '@/pages/budgets-page'
+import { LuloDocumentPage, LuloNewPage, LuloContractPage } from '@/pages/lulo-pages'
 import { DocumentsPage } from '@/pages/documents-page'
 import { InventoryPage } from '@/pages/inventory-page'
 import { LoginPage } from '@/pages/login-page'
@@ -84,6 +85,9 @@ export default function App() {
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="procurement" element={<ProcurementPage />} />
         <Route path="budgets" element={<BudgetsPage />} />
+        <Route path="budgets/new" element={<LuloNewPage />} />
+        <Route path="budgets/lulo/:luloId" element={<LuloDocumentPage />} />
+        <Route path="budgets/contracts/:contractId" element={<LuloContractPage />} />
         <Route path="budgets/apus/:apuId" element={<ApuEditorPage />} />
         <Route path="budgets/:budgetId" element={<BudgetEditorPage />} />
         <Route path="documents" element={<DocumentsPage />} />

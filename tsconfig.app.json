@@ -15,7 +15,8 @@
     "moduleDetection": "force",
     "noEmit": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@fur-lulo/*": ["../planta_beneficio_oro/apps/web/src/features/lulo/*"]
     },
     "jsx": "react-jsx",
 

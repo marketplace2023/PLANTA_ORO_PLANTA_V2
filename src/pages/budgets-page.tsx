@@ -7,12 +7,13 @@ import { usePlantAccess } from '@/components/use-plant-access'
 import { useBudgetSummary } from '@/features/budget/use-budget'
 import { formatMoney, formatPct } from '@/lib/format'
 import { useUrlFilters } from '@/lib/use-url-filters'
+import { LuloPlantBudgets } from './lulo-pages'
 
 type Tab = 'budgets' | 'apus' | 'resources'
 const TABS: Tab[] = ['budgets', 'apus', 'resources']
 
 /** Presupuestos (LULO): indicadores arriba y, debajo, presupuestos, APU y libro de precios con alta y edición. */
-export function BudgetsPage() {
+export function LegacyBudgetsPage() {
   const { slug, can } = usePlantAccess()
   const allowed = can('budget.read')
   const summary = useBudgetSummary(slug, allowed)
@@ -56,3 +57,5 @@ export function BudgetsPage() {
     </>
   )
 }
+
+export function BudgetsPage() { return <LuloPlantBudgets legacy={<LegacyBudgetsPage />} /> }
