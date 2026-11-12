@@ -1,3 +1,6 @@
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { BrandLogo } from '@/components/brand-logo'
+import { PanelFooter } from '@/components/panel-footer'
 import {
   Boxes,
   Calculator,
@@ -63,13 +66,13 @@ function PlantSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" className="flex w-full items-center gap-3 rounded-lg border border-white/10 bg-fur-navy-900 px-3 py-2.5 text-left outline-none hover:bg-fur-navy-800 focus-visible:ring-3 focus-visible:ring-ring/60" aria-label="Cambiar de planta">
+        <button type="button" className="flex w-full items-center gap-3 rounded-lg border border-border bg-fur-gray-50 px-3 py-2.5 text-left outline-none hover:bg-fur-gray-100 focus-visible:ring-3 focus-visible:ring-ring/60" aria-label="Cambiar de planta">
           <span className="grid size-9 shrink-0 place-items-center rounded-md bg-fur-gold-500 text-xs font-extrabold text-fur-navy-950">{currentPlant?.code.slice(0, 3) ?? '—'}</span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[10px] font-semibold tracking-widest text-fur-gold-400 uppercase">Planta</span>
-            <span className="block truncate text-sm font-semibold text-white">{currentPlant?.name ?? 'Elegir planta'}</span>
+            <span className="block text-[10px] font-semibold tracking-widest text-fur-navy-700 uppercase">Planta</span>
+            <span className="block truncate text-sm font-semibold text-fur-navy-900">{currentPlant?.name ?? 'Elegir planta'}</span>
           </span>
-          <ChevronsUpDown className="size-4 shrink-0 text-white/60" aria-hidden />
+          <ChevronsUpDown className="size-4 shrink-0 text-fur-gray-600" aria-hidden />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
@@ -92,26 +95,28 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
     <nav aria-label="Secciones de la planta" className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
       {SECTIONS.map((s) => (
         <div key={s.title}>
-          <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-white/50 uppercase">{s.title}</p>
+          <p className="sidebar-section-title mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-fur-gray-500 uppercase">{s.title}</p>
           <ul className="space-y-0.5">
             {s.items
               .filter((i) => !i.perm || permissions.includes(i.perm))
               .map(({ to, label, icon: Icon }) => (
                 <li key={to}>
                   <NavLink
+                    title={label}
+                    aria-label={label}
                     to={`${base}/${to}`}
                     onClick={onNavigate}
                     className={({ isActive }) =>
                       cn(
                         'flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/60',
-                        isActive ? 'border-fur-gold-500 bg-fur-navy-800 text-white' : 'border-transparent text-white/75 hover:bg-fur-navy-900 hover:text-white',
+                        isActive ? 'border-fur-gold-600 bg-fur-gold-500/20 text-fur-navy-950' : 'border-transparent text-fur-gray-600 hover:bg-fur-gray-100 hover:text-fur-navy-900',
                       )
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <Icon className={cn('size-[18px]', isActive && 'text-fur-gold-400')} aria-hidden />
-                        {label}
+                        <Icon className={cn('size-[18px]', isActive && 'text-fur-navy-900')} aria-hidden />
+                        <span className="sidebar-label">{label}</span>
                       </>
                     )}
                   </NavLink>
@@ -131,16 +136,16 @@ function UserCard() {
   if (!user) return null
   const role = user.isGlobalAdmin ? ROLE_LABELS.ECOSYSTEM_ADMIN : roleCodes.map((r) => ROLE_LABELS[r] ?? r).join(', ') || 'Solo lectura'
   return (
-    <div className="flex items-center gap-3 border-t border-white/10 p-3">
+    <div className="flex items-center gap-3 sidebar-user border-t border-border p-3">
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-fur-navy-800 text-sm font-bold text-fur-gold-400" aria-hidden>
         {user.firstName[0]}
         {user.lastName[0]}
       </span>
       <div className="min-w-0 flex-1 leading-tight">
-        <p className="truncate text-sm font-semibold text-white">
+        <p className="truncate text-sm font-semibold text-fur-navy-900">
           {user.firstName} {user.lastName}
         </p>
-        <p className="truncate text-xs text-white/60">{role}</p>
+        <p className="truncate text-xs text-fur-gray-600">{role}</p>
       </div>
       <button
         type="button"
@@ -150,7 +155,7 @@ function UserCard() {
           await logout()
           navigate('/login')
         }}
-        className="grid size-9 place-items-center rounded-lg text-white/70 outline-none hover:bg-fur-navy-800 hover:text-white focus-visible:ring-3 focus-visible:ring-ring/60"
+        className="grid size-9 place-items-center rounded-lg text-fur-gray-600 outline-none hover:bg-fur-gray-100 hover:text-fur-navy-900 focus-visible:ring-3 focus-visible:ring-ring/60"
       >
         <LogOut className="size-4" />
       </button>
@@ -160,12 +165,9 @@ function UserCard() {
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2.5 px-4 pt-4 pb-3">
-      <span className="grid size-9 place-items-center rounded-lg bg-fur-gold-500 text-sm font-extrabold text-fur-navy-950">FUR</span>
-      <div className="leading-tight">
-        <p className="text-sm font-bold text-white">Panel de Planta</p>
-        <p className="text-[11px] text-white/60">Ecosistema FUR</p>
-      </div>
+    <div className="sidebar-brand">
+      <BrandLogo />
+      <p>Panel de Planta</p>
     </div>
   )
 }
@@ -174,7 +176,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <Brand />
-      <div className="px-3 pb-1">
+      <div className="sidebar-context px-3 pb-1">
         <PlantSwitcher />
       </div>
       <Nav onNavigate={onNavigate} />
@@ -186,21 +188,31 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 /** Marco del panel: barra lateral navy fija en escritorio, cajón en móvil. */
 export function Shell({ context }: { context?: unknown }) {
   const [open, setOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem('fur-sidebar-collapsed') === 'true' } catch { return false }
+  })
+  const toggleSidebar = () => {
+    setCollapsed((previous) => {
+      try { localStorage.setItem('fur-sidebar-collapsed', String(!previous)) } catch { /* La preferencia es opcional. */ }
+      return !previous
+    })
+  }
   const { currentPlant } = usePlant()
   const queryClient = useQueryClient()
   const fetching = useIsFetching({ queryKey: ['plant'] }) > 0
 
   return (
-    <div className="min-h-screen bg-background lg:pl-64">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-fur-navy-950 lg:flex">
+    <div className="panel-shell studio-shell min-h-screen bg-background lg:pl-64" data-collapsed={collapsed}>
+      <a className="skip-link" href="#main-content">Saltar al contenido</a>
+      <aside id="desktop-navigation" className="panel-sidebar desktop-sidebar fixed inset-y-0 left-0 hidden w-64 flex-col lg:flex">
         <SidebarBody />
       </aside>
 
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menú">
           <button type="button" className="absolute inset-0 bg-black/50" aria-label="Cerrar menú" onClick={() => setOpen(false)} />
-          <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-fur-navy-950">
-            <button type="button" onClick={() => setOpen(false)} className="absolute top-3 right-3 grid size-9 place-items-center rounded-lg text-white/70 hover:bg-fur-navy-800" aria-label="Cerrar menú">
+          <aside className="panel-sidebar relative flex h-full w-72 max-w-[85vw] flex-col">
+            <button type="button" onClick={() => setOpen(false)} className="sidebar-close absolute top-2 right-2 grid size-8 place-items-center rounded-lg text-fur-navy-900 hover:bg-white/60" aria-label="Cerrar menú">
               <X className="size-5" />
             </button>
             <SidebarBody onNavigate={() => setOpen(false)} />
@@ -209,10 +221,12 @@ export function Shell({ context }: { context?: unknown }) {
       )}
 
       <div className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur lg:px-8">
+        <header className="panel-topbar sticky top-0 z-30 flex items-center gap-3 px-4 lg:px-8">
           <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label="Abrir menú" onClick={() => setOpen(true)}>
             <Menu />
           </Button>
+          <Button variant="ghost" size="icon-sm" className="sidebar-toggle hidden lg:flex" onClick={toggleSidebar} aria-label={collapsed ? 'Expandir navegación' : 'Contraer navegación'} aria-expanded={!collapsed} aria-controls="desktop-navigation">{collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</Button>
+          <img src="/brand/fur-mark.svg" alt="" className="topbar-brand-mark lg:hidden" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-fur-navy-900">{currentPlant?.name ?? 'Panel de Planta'}</p>
             {currentPlant && (
@@ -226,11 +240,12 @@ export function Shell({ context }: { context?: unknown }) {
             <RefreshCw className={cn(fetching && 'animate-spin')} /> <span className="hidden sm:inline">Actualizar</span>
           </Button>
         </header>
-        <main className="flex-1 px-4 py-6 lg:px-8">
+        <main id="main-content" className="panel-main flex-1 px-4 py-6 lg:px-8">
           <div className="mx-auto max-w-[1400px]">
             <Outlet context={context} />
           </div>
         </main>
+        <PanelFooter />
       </div>
     </div>
   )

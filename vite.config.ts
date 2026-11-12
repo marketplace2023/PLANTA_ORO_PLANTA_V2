@@ -9,10 +9,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
+      '@fur-lulo': path.resolve(import.meta.dirname, '../PLANTA_ORO_WEB_V2/apps/web/src/features/lulo'),
+      '@fur-lulo-style': path.resolve(import.meta.dirname, '../PLANTA_ORO_WEB_V2/apps/web/src/styles/lulo-workspace.css'),
     },
+    dedupe: ['react', 'react-dom', '@tanstack/react-query', 'react-router-dom', 'sonner', 'lucide-react'],
   },
   server: {
     port: 5174,
+    fs: { allow: [path.resolve(import.meta.dirname, '..')] },
     // En desarrollo el navegador habla con este mismo origen y Vite reenvía /api a la API: sin CORS que configurar.
     proxy: { '/api': { target: 'http://localhost:3000', changeOrigin: true } },
   },

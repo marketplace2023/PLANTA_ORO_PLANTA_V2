@@ -1,3 +1,4 @@
+import { NetworkMark } from '@/components/network-mark'
 import { ArrowRight, Undo2 } from 'lucide-react'
 import { Empty, Failed, Loading, Panel, Pill, ScreenHeader } from '@/components/kit'
 import { usePlantAccess } from '@/components/use-plant-access'
@@ -92,7 +93,8 @@ export function ProcessesPage() {
         ) : networks.data && networks.data.length > 0 ? (
           <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             {networks.data.map((n) => (
-              <li key={n.id} className="rounded-lg border border-border border-l-4 bg-card p-3" style={{ borderLeftColor: n.colorToken ? `var(--${n.colorToken})` : undefined }}>
+              <li key={n.id} className="plant-network-card rounded-lg border border-border border-l-4 bg-card p-3" style={{ borderLeftColor: n.colorToken ? `var(--${n.colorToken})` : undefined }}>
+                <NetworkMark code={n.code} colorToken={n.colorToken} />
                 <p className="fur-code text-[11px] text-muted-foreground">{n.code}</p>
                 <p className="font-semibold text-fur-navy-900">{n.name}</p>
                 <p className="mt-1 text-xs text-fur-gray-600">

@@ -15,7 +15,8 @@
     "moduleDetection": "force",
     "noEmit": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@fur-lulo/*": ["../PLANTA_ORO_WEB_V2/apps/web/src/features/lulo/*"]
     },
     "jsx": "react-jsx",
 

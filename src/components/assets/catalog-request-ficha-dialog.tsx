@@ -40,7 +40,7 @@ export function CatalogRequestFichaDialog({ request, plantSlug, onClose, onCreat
   const headingClass = 'border-b border-border px-4 py-3 text-sm font-semibold text-fur-navy-900'
 
   return <Dialog open onOpenChange={open => !open && onClose()}>
-    <DialogContent showCloseButton={false} className="flex max-h-[92dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-4xl">
+    <DialogContent showCloseButton={false} className="fur-asset-dialog flex max-h-[92dvh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-4xl">
       <header className="flex shrink-0 items-start gap-4 border-b px-5 py-5">
         <div className="min-w-0 flex-1">
           <DialogTitle>Ficha de solicitud</DialogTitle>
