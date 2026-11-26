@@ -9,8 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
-      '@fur-lulo': path.resolve(import.meta.dirname, '../planta_beneficio_oro/apps/web/src/features/lulo'),
-      '@fur-lulo-style': path.resolve(import.meta.dirname, '../planta_beneficio_oro/apps/web/src/styles/lulo-workspace.css'),
+      '@fur-lulo': path.resolve(import.meta.dirname, '../PLANTA_ORO_WEB_V2/apps/web/src/features/lulo'),
+      '@fur-lulo-style': path.resolve(import.meta.dirname, '../PLANTA_ORO_WEB_V2/apps/web/src/styles/lulo-workspace.css'),
     },
     dedupe: ['react', 'react-dom', '@tanstack/react-query', 'react-router-dom', 'sonner', 'lucide-react'],
   },

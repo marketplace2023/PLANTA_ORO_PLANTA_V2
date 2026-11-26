@@ -12,7 +12,7 @@ import { LuloEditor } from '@fur-lulo/lulo-editor'
 import { LuloWorksPortfolio } from '@fur-lulo/works-portfolio'
 import { LuloContractWorkspace } from '@fur-lulo/contract-workspace'
 import { stateLabels, decimalText, type LuloDocument } from '@fur-lulo/types'
-import '../../../planta_beneficio_oro/apps/web/src/styles/lulo-workspace.css'
+import '../../../PLANTA_ORO_WEB_V2/apps/web/src/styles/lulo-workspace.css'
 
 export function LuloPlantBudgets({ legacy }: { legacy: ReactNode }) {
   const { slug, plant, can } = usePlantAccess(); const [params, setParams] = useSearchParams(); const tab = params.get('tab') ?? 'masters'; const setTab = (tab: string) => setParams({ tab }); const [term, setTerm] = useState(''); const [search, setSearch] = useState(''); const [page, setPage] = useState(1)

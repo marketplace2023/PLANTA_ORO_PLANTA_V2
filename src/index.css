@@ -8,8 +8,9 @@
 @import "./styles/studio.css";
 
 @import "./styles/dark-mode.css";
+@import "./styles/asset-requests.css";
 @import "./styles/dark-studio.css";
-@source "../../planta_beneficio_oro/apps/web/src/features/lulo";
+@source "../../PLANTA_ORO_WEB_V2/apps/web/src/features/lulo";
 
 @custom-variant dark (&:is(.dark *));
 

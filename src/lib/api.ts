@@ -113,3 +113,6 @@ export function formBody(fields: Record<string, string | undefined>, file: File)
 }
 
 export const jsonBody = (data: unknown): RequestInit => ({ body: JSON.stringify(data) })
+
+/** Convierte una ruta de imagen del catálogo en su URL pública de la API. */
+export const apiUrl = (path: string) => `${API_URL}${path}`

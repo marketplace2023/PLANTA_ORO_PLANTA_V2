@@ -16,7 +16,7 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@fur-lulo/*": ["../planta_beneficio_oro/apps/web/src/features/lulo/*"]
+      "@fur-lulo/*": ["../PLANTA_ORO_WEB_V2/apps/web/src/features/lulo/*"]
     },
     "jsx": "react-jsx",
 

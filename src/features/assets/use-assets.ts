@@ -19,8 +19,9 @@ export type AssetItem = {
   stage: { code: string; name: string; group: string } | null
   model: { id: string; name: string }
   type: { code: string; name: string }
-  family: { code: string; name: string }
+  family: { id?: string; code: string; tagCode?: string; name: string }
   manufacturer: string | null
+  referenceModels?: Array<{ id: string; modelName: string; catalogTag?: string | null }>
   networks: NetworkRef[]
 }
 
@@ -49,6 +50,7 @@ export type AssetFur = {
   asset: AssetDetail
   plant: { id: string; name: string; slug: string; code: string }
   stage: AssetItem['stage']
+  referenceModels?: Array<{ id: string; modelName: string; catalogTag?: string | null }>
   networks: NetworkRef[]
   documents: DocumentItem[]
   /** Vacío si quien consulta no tiene maintenance.read. */
@@ -115,9 +117,12 @@ export const useAssetFur = (slug: string | undefined, assetId: string | undefine
   })
 
 export type AssetInput = {
-  tag: string
+  familyId?: string
+  referenceModelIds?: string[]
+  specifications?: Record<string, unknown>
+  components?: string[]
   name: string
-  assetModelId: string
+  assetModelId?: string
   stageCode?: string | null
   serialNumber?: string | null
   status?: AssetStatus
@@ -126,6 +131,18 @@ export type AssetInput = {
   location?: string | null
   isPublic?: boolean
   networkCodes?: string[]
+}
+
+export type AssetTagSelection = { familyId: string; stageCode: string; networkCode: string }
+
+/** Vista previa sin reservar correlativo; cada combinación tiene su propia consulta. */
+export function useAssetTagPreview(slug: string, selection: AssetTagSelection | null, active = true) {
+  return useQuery({
+    queryKey: ['plant', slug, 'assets', 'tag-preview', selection],
+    queryFn: () => api<{ tag: string }>(`/plants/${slug}/assets/tag-preview${toQuery(selection ?? {})}`),
+    enabled: active && !!selection,
+    retry: false,
+  })
 }
 
 export function useCreateAsset(slug: string) {
@@ -160,15 +177,19 @@ export function useDecommissionAsset(slug: string, assetId: string) {
 
 // ---------- Catálogo global ----------
 
-export type CatalogFamily = { id: string; code: string; name: string; icon: string | null }
+export type CatalogFamily = { id: string; tagCode?: string; code: string; name: string; icon: string | null }
 export type CatalogModel = {
   id: string
+  catalogTag?: string | null
   modelName: string
   status: string
   specifications: Record<string, unknown>
   technicalData: Record<string, unknown>
-  type: { id: string; code: string; name: string }
-  family: { id: string; code: string; name: string; icon: string | null }
+  imageUrl: string | null
+  stageCodes: string[]
+  networkCodes: string[]
+  type: { id: string; code: string; name: string; description?: string | null; stageCodes?: string[] }
+  family: { id: string; code: string; tagCode?: string; name: string; icon: string | null }
   manufacturer: { id: string; name: string; countryCode: string | null } | null
 }
 export type CatalogManufacturer = { id: string; name: string; countryCode: string | null }
@@ -179,7 +200,7 @@ export const useCatalogFamilies = () =>
 export const useCatalogManufacturers = () =>
   useQuery({ queryKey: ['catalog', 'manufacturers'], queryFn: () => api<CatalogManufacturer[]>('/catalog/manufacturers'), staleTime: 5 * 60_000 })
 
-export type CatalogFilters = { family?: string; manufacturerId?: string; search?: string; page?: string; status?: 'ACTIVE' | 'INACTIVE' | 'ALL' }
+export type CatalogFilters = { stage?: string; network?: string; family?: string; manufacturerId?: string; search?: string; page?: string; status?: 'ACTIVE' | 'INACTIVE' | 'ALL' }
 
 export const useCatalogModels = (filters: CatalogFilters, pageSize = 24) =>
   useQuery({
